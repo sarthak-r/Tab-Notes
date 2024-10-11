@@ -1,0 +1,113 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+.note {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.note h2 {
+    margin-top: 0;
+}
+
+.note h2 a {
+    color: #0366d6;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.note h2 a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+
+
+.note-content {
+    white-space: pre-wrap;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    padding: 5px;
+    min-height: 50px;
+}
+
+.note-content:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.save-note {
+    position: absolute;
+    top: 10px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.delete-note {
+    position: absolute;
+    top: 10px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.save-note {
+    right: 70px;
+    background-color: #28a746bf;
+    color: white;
+}
+
+.save-note:hover {
+    background-color: #2188378f;
+}
+
+.delete-note {
+    right: 10px;
+    background-color: #dc3546cc;
+    color: white;
+}
+
+.delete-note:hover {
+    background-color: #c82333d1;
+}
+
+.note-timestamps {
+    font-size: 0.8em;
+    color: #666;
+    margin-top: 5px;
+}
+
+.note-timestamps span {
+    display: block;
+}
+
+footer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+footer a {
+    color: #0366d6;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
