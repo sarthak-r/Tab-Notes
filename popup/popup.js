@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 		const viewAllNotesButton = document.getElementById('view-all-notes');
 		viewAllNotesButton.addEventListener('click', () => {
-			const allNotesUrl = chrome.runtime.getURL('all-notes.html');
+			const allNotesUrl = chrome.runtime.getURL('./all-notes/all-notes.html');
 			chrome.tabs.create({ url: allNotesUrl });
 		});
 
