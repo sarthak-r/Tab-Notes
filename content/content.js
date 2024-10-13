@@ -1,2 +1,2 @@
-console.log('Tab Notes content script loaded');
+// console.log('Tab Notes content script loaded');
 

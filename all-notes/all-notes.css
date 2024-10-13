@@ -1,113 +1,320 @@
-body {
-    font-family: Arial, sans-serif;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --background-color: #f1f3f5;
+    --text-color: #333;
+    --border-color: #ccc;
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --card-background: #ffffff;
+    --card-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
-    text-align: center;
+body {
+    font-family: var(--font-family);
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--background-color);
+}
+
+header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.search-container {
+    position: relative;
+    width: 100%;
+}
+
+.search-container i {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: var(--secondary-color);
+}
+
+#search {
+    width: 100%;
+    padding: 8px 12px 8px 35px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+#sort {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1em;
+    background-color: #fff;
+}
+
+#notes-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
 }
 
 .note {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 20px;
+    background-color: var(--card-background);
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
     position: relative;
+}
+
+.note:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
 .note h2 {
     margin-top: 0;
+    font-size: 1.2em;
+    /* Removed color to let the link style control it */
+    cursor: pointer;
+    text-decoration: none;
 }
 
 .note h2 a {
-    color: #0366d6;
-    text-decoration: none;
-    transition: color 0.3s ease;
+    color: var(--text-color); /* Changed from var(--primary-color) to var(--text-color) */
+    word-break: break-word; /* Allows URLs to break and wrap to the next line */
 }
 
 .note h2 a:hover {
-    color: #0056b3;
+    color: var(--primary-color); /* Optional: Change color on hover for better visibility */
     text-decoration: underline;
 }
 
-
-
 .note-content {
+    flex: 1;
+    margin: 10px 0;
     white-space: pre-wrap;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    padding: 5px;
-    min-height: 50px;
-}
-
-.note-content:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-}
-
-.save-note {
-    position: absolute;
-    top: 10px;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.delete-note {
-    position: absolute;
-    top: 10px;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.save-note {
-    right: 70px;
-    background-color: #28a746bf;
-    color: white;
-}
-
-.save-note:hover {
-    background-color: #2188378f;
-}
-
-.delete-note {
-    right: 10px;
-    background-color: #dc3546cc;
-    color: white;
-}
-
-.delete-note:hover {
-    background-color: #c82333d1;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: #fafafa;
 }
 
 .note-timestamps {
     font-size: 0.8em;
     color: #666;
-    margin-top: 5px;
 }
 
 .note-timestamps span {
     display: block;
 }
 
+.save-note, .delete-note {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.save-note:hover {
+    background-color: #0056b3;
+}
+
+.delete-note {
+    background-color: var(--danger-color);
+    margin-left: 10px;
+}
+
+.delete-note:hover {
+    background-color: #c82333;
+}
+
 footer {
-    margin-top: 20px;
+    margin-top: 30px;
     text-align: center;
+    position: relative;
 }
 
 footer a {
-    color: #0366d6;
+    color: var(--primary-color);
     text-decoration: none;
 }
 
 footer a:hover {
     text-decoration: underline;
+}
+
+#back-to-top {
+    position: absolute;
+    right: 20px;
+    bottom: 10px;
+    background-color: var(--primary-color);
+    border: none;
+    color: white;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: none;
+    transition: background-color 0.3s;
+}
+
+#back-to-top:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 600px) {
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #back-to-top {
+        right: 10px;
+        bottom: 10px;
+    }
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+    --background-color: #1a1a1a;
+    --text-color: #f1f1f1;
+    --border-color: #444;
+    --card-background: #2c2c2c;
+    --card-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+body.dark-mode .note {
+    background-color: var(--card-background);
+    box-shadow: var(--card-shadow);
+}
+
+body.dark-mode .note h2 a {
+    color: var(--primary-color);
+}
+
+body.dark-mode .note-content {
+    background-color: #3c3c3c;
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+body.dark-mode .note-timestamps {
+    color: #aaa;
+}
+
+body.dark-mode #search,
+body.dark-mode #sort {
+    background-color: #3c3c3c;
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .save-note,
+body.dark-mode .delete-note {
+    background-color: #444;
+}
+
+body.dark-mode .save-note:hover {
+    background-color: #555;
+}
+
+body.dark-mode .delete-note:hover {
+    background-color: #c82333;
+}
+
+body.dark-mode footer a {
+    color: var(--primary-color);
+}
+
+/* Dark mode toggle switch styles */
+.toggle-container {
+    display: flex;
+    align-items: center;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 20px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+.toggle-label {
+  font-size: 0.8em;
+  margin-left: 5px;
+}
+
+body.dark-mode .toggle-label {
+  color: #f1f1f1;
 }

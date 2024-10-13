@@ -3,23 +3,45 @@
 <head>
   <title>Tab Notes</title>
   <link rel="stylesheet" type="text/css" href="popup.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+  <header>
+    <h2>Tab Notes</h2>
+    <div id="theme-toggle" class="toggle-container">
+      <label class="switch" title="Toggle Light/Dark Mode">
+        <input type="checkbox" id="dark-mode-toggle">
+        <span class="slider round"></span>
+      </label>
+      <span class="toggle-label">Dark Mode</span>
+    </div>
+  </header>
+  
   <div id="editor-container">
-    <div id="editor" contenteditable="true"></div>
+    <div id="editor" contenteditable="true" placeholder="Write your notes here..."></div>
   </div>
+  
   <div id="toolbar">
-    <button id="bold">B</button>
-    <button id="italic">I</button>
-    <button id="underline">U</button>
+    <button id="bold" title="Bold"><i class="fas fa-bold"></i></button>
+    <button id="italic" title="Italic"><i class="fas fa-italic"></i></button>
+    <button id="underline" title="Underline"><i class="fas fa-underline"></i></button>
   </div>
-  <!-- <button id="toggle-sidebar">Open Sidebar</button> -->
-  <div id="error-message" style="color: red;"></div>
-  <script src="../lib/storage.js"></script>
-  <script src="popup.js"></script>
-  <button id="view-all-notes">View All Notes</button>
+  
+  <div id="action-buttons">
+    <button id="view-all-notes" class="primary">View All Notes</button>
+  </div>
+  
+  <div id="error-message"></div>
+
+  <div id="shortcut-info">
+    <p>Keyboard shortcut: <kbd>Ctrl+Shift+L</kbd> (or <kbd>Cmd+Shift+L</kbd> on Mac)</p>
+  </div>
+
   <footer>
     <a href="https://github.com/sarthak-r/Tab-Notes" target="_blank">GitHub Repository</a>
   </footer>
+  
+  <script src="../lib/storage.js"></script>
+  <script src="popup.js"></script>
 </body>
 </html>

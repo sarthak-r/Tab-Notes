@@ -3,7 +3,7 @@ importScripts('lib/storage.js');
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (changeInfo.status === 'complete') {
         const notes = await Storage.getNotes(tab.url);
-        if (notes) {
+        if (notes && notes.content.trim().length > 0) {
             chrome.action.setBadgeText({ text: '📝', tabId });
             chrome.action.setBadgeBackgroundColor({ color: '#FFA500', tabId });
         } else {
@@ -12,7 +12,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     }
 });
 
-// Update badge when notes are saved
+// Update badge when notes are saved or deleted
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === 'updateBadge') {
         const { url, hasNotes } = request.payload;

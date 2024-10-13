@@ -36,5 +36,14 @@
         "resources": ["sidebar/sidebar.html", "sidebar/sidebar.css", "all-notes/all-notes.html"],
         "matches": ["<all_urls>"]
       }
-    ]
+    ],
+    "commands": {
+      "_execute_action": {
+        "suggested_key": {
+          "default": "Ctrl+Shift+L",
+          "mac": "Command+Shift+L"
+        },
+        "description": "Open Tab Notes"
+      }
+    }
   }

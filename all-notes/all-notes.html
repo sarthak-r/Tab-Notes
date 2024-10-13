@@ -3,15 +3,42 @@
 <head>
   <title>All Tab Notes</title>
   <link rel="stylesheet" type="text/css" href="./all-notes.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <h1>All Tab Notes</h1>
+  <header>
+    <h1>All Tab Notes</h1>
+    <div class="controls">
+      <div class="search-container">
+        <i class="fas fa-search" aria-hidden="true"></i>
+        <input type="text" id="search" placeholder="Search notes..." aria-label="Search Notes" />
+      </div>
+      <div class="sort-container">
+        <label for="sort">Sort By:</label>
+        <select id="sort" aria-label="Sort Notes">
+          <option value="date-desc">Date (Newest First)</option>
+          <option value="date-asc">Date (Oldest First)</option>
+        </select>
+      </div>
+      <div class="toggle-container">
+        <label class="switch" title="Toggle Light/Dark Mode">
+          <input type="checkbox" id="dark-mode-toggle">
+          <span class="slider round"></span>
+        </label>
+        <span class="toggle-label">Dark Mode</span>
+      </div>
+    </div>
+  </header>
+  
   <div id="notes-container"></div>  
+  
+  <footer>
+    <!-- <p>Created by <a href="https://github.com/sarthak-r/Tab-Notes" target="_blank">sarthak-r</a></p> -->
+    <a href="https://github.com/sarthak-r/Tab-Notes" target="_blank">GitHub Repository</a>
+    <button id="back-to-top" aria-label="Back to Top"><i class="fas fa-arrow-up"></i></button>
+  </footer>
+  
   <script src="../lib/storage.js"></script>
   <script src="./all-notes.js"></script>
-  <footer>
-    <p>Created by sarthak-r</p>
-    <a href="https://github.com/sarthak-r/Tab-Notes" target="_blank">GitHub Repository</a>
-  </footer>
 </body>
 </html>

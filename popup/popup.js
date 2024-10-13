@@ -11,18 +11,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 		const url = tab.url;
 
-		console.log('Current tab URL:', url);
+		// console.log('Current tab URL:', url);
 
 		// Load existing notes
 		const { content: notes } = await Storage.getNotes(url);
 		editor.innerHTML = notes;
 
-		console.log('Notes loaded:', notes);
+		// console.log('Notes loaded:', notes);
 
 		// Save notes on input
 		editor.addEventListener('input', () => {
 			Storage.saveNotes(url, editor.innerHTML);
-			console.log('Notes saved');
+			// console.log('Notes saved');
 		});
 
 		// Implement basic text formatting
@@ -32,16 +32,50 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 		// Debug: Log all stored notes
 		const allNotes = await Storage.getAllNotes();
-		console.log('All stored notes:', allNotes);
+		// console.log('All stored notes:', allNotes);
 
 		const viewAllNotesButton = document.getElementById('view-all-notes');
-		viewAllNotesButton.addEventListener('click', () => {
-			const allNotesUrl = chrome.runtime.getURL('./all-notes/all-notes.html');
-			chrome.tabs.create({ url: allNotesUrl });
+		viewAllNotesButton.addEventListener('click', async () => {
+			const allNotesPath = 'all-notes/all-notes.html';
+			
+			// Query for all tabs
+			chrome.tabs.query({}, function(tabs) {
+				const existingTab = tabs.find(tab => tab.url && tab.url.includes(allNotesPath));
+				
+				if (existingTab) {
+					// If the tab exists, switch to it and refresh
+					chrome.tabs.update(existingTab.id, {active: true}, function(tab) {
+						chrome.tabs.reload(tab.id);
+					});
+				} else {
+					// If the tab doesn't exist, create a new one
+					const allNotesUrl = chrome.runtime.getURL(allNotesPath);
+					chrome.tabs.create({url: allNotesUrl});
+				}
+			});
+		});
+
+		// Theme Toggle
+		const themeToggle = document.getElementById('dark-mode-toggle');
+
+		function toggleDarkMode(isDark) {
+			document.body.classList.toggle('dark-mode', isDark);
+			themeToggle.checked = isDark;
+			chrome.storage.sync.set({ darkMode: isDark });
+		}
+
+		themeToggle.addEventListener('change', (e) => {
+			toggleDarkMode(e.target.checked);
+		});
+
+		// Load user's dark mode preference
+		chrome.storage.sync.get('darkMode', (result) => {
+			const isDarkMode = result.darkMode || false;
+			toggleDarkMode(isDarkMode);
 		});
 
 	} catch (error) {
-		console.error('Error in popup script:', error);
+		// console.error('Error in popup script:', error);
 		errorMessageElement.textContent = 'An error occurred: ' + error.message;
 	}
 });
