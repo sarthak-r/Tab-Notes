@@ -1,81 +1,134 @@
 document.addEventListener('DOMContentLoaded', async () => {
-	console.log('Popup script loaded');
-	const errorMessageElement = document.getElementById('error-message');
-	const editor = document.getElementById('editor');
-	const boldButton = document.getElementById('bold');
-	const italicButton = document.getElementById('italic');
-	const underlineButton = document.getElementById('underline');
+    console.log('Popup script loaded');
+    const errorMessageElement = document.getElementById('error-message');
+    const editor = document.getElementById('editor');
+    const tagsInput = document.getElementById('tags-input');
+    const collectionSelect = document.getElementById('collection-select');
+    const addCollectionButton = document.querySelector('.add-collection-button');
+    const viewAllButton = document.getElementById('view-all');
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    
+    let currentUrl = '';
+    let currentTags = [];
+    let currentCollectionId = null;
 
-	try {
-		// Get current tab URL
-		const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-		const url = tab.url;
+    try {
+        // Get current tab URL
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        currentUrl = tab.url;
 
-		// console.log('Current tab URL:', url);
+        // Load existing notes and metadata
+        const noteData = await Storage.getNotes(currentUrl);
+        editor.innerHTML = noteData.content || '';
+        currentTags = noteData.tags || [];
+        currentCollectionId = noteData.collectionId;
 
-		// Load existing notes
-		const { content: notes } = await Storage.getNotes(url);
-		editor.innerHTML = notes;
+        // Initialize collections and tags
+        await loadCollections();
+        renderTags();
 
-		// console.log('Notes loaded:', notes);
+        // Event Listeners
+        editor.addEventListener('input', debounce(async () => {
+            await Storage.saveNotes(currentUrl, editor.innerHTML, currentTags, currentCollectionId);
+        }, 500));
 
-		// Save notes on input
-		editor.addEventListener('input', () => {
-			Storage.saveNotes(url, editor.innerHTML);
-			// console.log('Notes saved');
-		});
+        tagsInput.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter' && tagsInput.value.trim()) {
+                e.preventDefault();
+                const newTag = tagsInput.value.trim();
+                if (!currentTags.includes(newTag)) {
+                    currentTags.push(newTag);
+                    await Storage.saveNotes(currentUrl, editor.innerHTML, currentTags, currentCollectionId);
+                    renderTags();
+                }
+                tagsInput.value = '';
+            }
+        });
 
-		// Implement basic text formatting
-		boldButton.addEventListener('click', () => document.execCommand('bold', false, null));
-		italicButton.addEventListener('click', () => document.execCommand('italic', false, null));
-		underlineButton.addEventListener('click', () => document.execCommand('underline', false, null));
+        collectionSelect.addEventListener('change', async () => {
+            currentCollectionId = collectionSelect.value;
+            await Storage.saveNotes(currentUrl, editor.innerHTML, currentTags, currentCollectionId);
+        });
 
-		// Debug: Log all stored notes
-		const allNotes = await Storage.getAllNotes();
-		// console.log('All stored notes:', allNotes);
+        addCollectionButton.addEventListener('click', async () => {
+            const name = prompt('Enter collection name:');
+            if (name) {
+                const color = '#' + Math.floor(Math.random()*16777215).toString(16);
+                const collection = await Storage.saveCollection({ name, color });
+                currentCollectionId = collection.id;
+                await loadCollections();
+                await Storage.saveNotes(currentUrl, editor.innerHTML, currentTags, currentCollectionId);
+            }
+        });
 
-		const viewAllNotesButton = document.getElementById('view-all-notes');
-		viewAllNotesButton.addEventListener('click', async () => {
-			const allNotesPath = 'all-notes/all-notes.html';
-			
-			// Query for all tabs
-			chrome.tabs.query({}, function(tabs) {
-				const existingTab = tabs.find(tab => tab.url && tab.url.includes(allNotesPath));
-				
-				if (existingTab) {
-					// If the tab exists, switch to it and refresh
-					chrome.tabs.update(existingTab.id, {active: true}, function(tab) {
-						chrome.tabs.reload(tab.id);
-					});
-				} else {
-					// If the tab doesn't exist, create a new one
-					const allNotesUrl = chrome.runtime.getURL(allNotesPath);
-					chrome.tabs.create({url: allNotesUrl});
-				}
-			});
-		});
+        viewAllButton.addEventListener('click', () => {
+            chrome.tabs.create({ url: 'all-notes/all-notes.html' });
+        });
 
-		// Theme Toggle
-		const themeToggle = document.getElementById('dark-mode-toggle');
+        // Dark mode
+        darkModeToggle.addEventListener('change', (e) => {
+            toggleDarkMode(e.target.checked);
+        });
 
-		function toggleDarkMode(isDark) {
-			document.body.classList.toggle('dark-mode', isDark);
-			themeToggle.checked = isDark;
-			chrome.storage.sync.set({ darkMode: isDark });
-		}
+        // Load user's dark mode preference
+        chrome.storage.sync.get('darkMode', (result) => {
+            const isDarkMode = result.darkMode || false;
+            toggleDarkMode(isDarkMode);
+        });
 
-		themeToggle.addEventListener('change', (e) => {
-			toggleDarkMode(e.target.checked);
-		});
+    } catch (error) {
+        console.error('Error in popup script:', error);
+        if (errorMessageElement) {
+            errorMessageElement.textContent = 'An error occurred: ' + error.message;
+        }
+    }
 
-		// Load user's dark mode preference
-		chrome.storage.sync.get('darkMode', (result) => {
-			const isDarkMode = result.darkMode || false;
-			toggleDarkMode(isDarkMode);
-		});
+    // Helper functions
+    async function loadCollections() {
+        const collections = await Storage.getCollections();
+        collectionSelect.innerHTML = '<option value="">No Collection</option>' +
+            collections.map(c => `<option value="${c.id}" ${c.id === currentCollectionId ? 'selected' : ''}>${c.name}</option>`).join('');
+    }
 
-	} catch (error) {
-		// console.error('Error in popup script:', error);
-		errorMessageElement.textContent = 'An error occurred: ' + error.message;
-	}
+    function renderTags() {
+        const tagsContainer = document.createElement('div');
+        tagsContainer.className = 'tags-container';
+        tagsContainer.innerHTML = currentTags.map(tag => `
+            <span class="tag">
+                ${tag}
+                <span class="remove-tag" data-tag="${tag}">&times;</span>
+            </span>
+        `).join('');
+        
+        const existingContainer = document.querySelector('.tags-container');
+        if (existingContainer) {
+            existingContainer.replaceWith(tagsContainer);
+        } else {
+            tagsInput.insertAdjacentElement('afterend', tagsContainer);
+        }
+
+        // Add event listeners for tag removal
+        tagsContainer.querySelectorAll('.remove-tag').forEach(button => {
+            button.addEventListener('click', async () => {
+                const tagToRemove = button.dataset.tag;
+                currentTags = currentTags.filter(t => t !== tagToRemove);
+                await Storage.saveNotes(currentUrl, editor.innerHTML, currentTags, currentCollectionId);
+                renderTags();
+            });
+        });
+    }
+
+    function toggleDarkMode(isDark) {
+        document.body.classList.toggle('dark-mode', isDark);
+        darkModeToggle.checked = isDark;
+        chrome.storage.sync.set({ darkMode: isDark });
+    }
+
+    function debounce(func, delay) {
+        let timeoutId;
+        return function (...args) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
 });

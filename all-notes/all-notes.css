@@ -19,6 +19,38 @@ body {
     background-color: var(--background-color);
 }
 
+.container {
+    display: flex;
+    min-height: 100vh;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.sidebar {
+    width: 250px;
+    min-width: 250px;
+    padding: 20px;
+    background: #f5f5f5;
+    border-right: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+}
+
+.dark-mode .sidebar {
+    background: #2a2a2a;
+    border-right-color: #444;
+}
+
+.main-content {
+    flex: 1;
+    padding: 20px;
+    min-width: 0; /* Prevents flex items from overflowing */
+}
+
 header {
     display: flex;
     flex-direction: column;
@@ -32,6 +64,7 @@ header h1 {
 }
 
 .controls {
+    margin-bottom: 20px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -53,59 +86,188 @@ header h1 {
     color: var(--secondary-color);
 }
 
-#search {
+#search, #sort {
     width: 100%;
-    padding: 8px 12px 8px 35px;
-    border: 1px solid var(--border-color);
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 1em;
 }
 
-#sort {
-    padding: 8px 12px;
-    border: 1px solid var(--border-color);
+.dark-mode #search,
+.dark-mode #sort {
+    background: #333;
+    border-color: #444;
+    color: #fff;
+}
+
+.filter-section {
+    margin-bottom: 20px;
+}
+
+.filter-section h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.dark-mode .filter-section h3 {
+    color: #aaa;
+}
+
+.tags-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tag-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.tag-filter input[type="checkbox"] {
+    margin: 0;
+}
+
+#collection-filter {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 1em;
-    background-color: #fff;
+}
+
+.dark-mode #collection-filter {
+    background: #333;
+    border-color: #444;
+    color: #fff;
 }
 
 #notes-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
+    width: 100%;
 }
 
 .note {
-    background-color: var(--card-background);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    background: white;
+    border: 1px solid #ddd;
     border-radius: 8px;
     padding: 15px;
-    box-shadow: var(--card-shadow);
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.2s, box-shadow 0.2s;
-    position: relative;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.note:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+.dark-mode .note {
+    background: #333;
+    border-color: #444;
+}
+
+.note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.note-collection {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: white;
+}
+
+.note-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 10px 0;
+}
+
+.tag {
+    background: #e0e0e0;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.dark-mode .tag {
+    background: #444;
+}
+
+.note-timestamps {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #666;
+    margin: 10px 0;
+}
+
+.dark-mode .note-timestamps {
+    color: #aaa;
+}
+
+.note-timestamps span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.action-buttons button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.save-note {
+    background: #4CAF50;
+    color: white;
+}
+
+.save-note:hover {
+    background: #45a049;
+}
+
+.delete-note {
+    background: #ff4444;
+    color: white;
+}
+
+.delete-note:hover {
+    background: #cc0000;
 }
 
 .note h2 {
     margin-top: 0;
     font-size: 1.2em;
-    /* Removed color to let the link style control it */
     cursor: pointer;
     text-decoration: none;
 }
 
 .note h2 a {
-    color: var(--text-color); /* Changed from var(--primary-color) to var(--text-color) */
-    word-break: break-word; /* Allows URLs to break and wrap to the next line */
+    color: var(--text-color);
+    word-break: break-word;
 }
 
 .note h2 a:hover {
-    color: var(--primary-color); /* Optional: Change color on hover for better visibility */
+    color: var(--primary-color);
     text-decoration: underline;
 }
 
@@ -118,43 +280,6 @@ header h1 {
     padding: 8px;
     border-radius: 4px;
     background-color: #fafafa;
-}
-
-.note-timestamps {
-    font-size: 0.8em;
-    color: #666;
-}
-
-.note-timestamps span {
-    display: block;
-}
-
-.save-note, .delete-note {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 6px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9em;
-    margin-top: 10px;
-    transition: background-color 0.3s;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.save-note:hover {
-    background-color: #0056b3;
-}
-
-.delete-note {
-    background-color: var(--danger-color);
-    margin-left: 10px;
-}
-
-.delete-note:hover {
-    background-color: #c82333;
 }
 
 footer {
@@ -173,33 +298,29 @@ footer a:hover {
 }
 
 #back-to-top {
-    position: absolute;
+    position: fixed;
+    bottom: 20px;
     right: 20px;
-    bottom: 10px;
-    background-color: var(--primary-color);
-    border: none;
+    background: #4CAF50;
     color: white;
-    padding: 8px;
+    border: none;
     border-radius: 50%;
+    width: 40px;
+    height: 40px;
     cursor: pointer;
     display: none;
-    transition: background-color 0.3s;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 #back-to-top:hover {
-    background-color: #0056b3;
+    background: #45a049;
 }
 
-@media (max-width: 600px) {
-    .controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    #back-to-top {
-        right: 10px;
-        bottom: 10px;
-    }
+.theme-toggle {
+    margin-top: auto;
+    padding-top: 20px;
 }
 
 /* Dark Mode Styles */
@@ -317,4 +438,428 @@ input:checked + .slider:before {
 
 body.dark-mode .toggle-label {
   color: #f1f1f1;
+}
+
+.collections-section {
+    margin-bottom: 30px;
+}
+
+.collections-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.collection-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    background: white;
+}
+
+.dark-mode .collection-item {
+    background: #333;
+}
+
+.collection-item:hover {
+    background: #f0f0f0;
+}
+
+.dark-mode .collection-item:hover {
+    background: #444;
+}
+
+.collection-item.active {
+    background: #e8f0fe;
+    border-left: 3px solid #1a73e8;
+}
+
+.dark-mode .collection-item.active {
+    background: #1a73e8;
+    color: white;
+}
+
+.collection-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.collection-info {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.collection-name {
+    font-weight: 500;
+}
+
+.note-count {
+    font-size: 12px;
+    color: #666;
+    background: #f0f0f0;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.dark-mode .note-count {
+    color: #ccc;
+    background: #444;
+}
+
+.dark-mode .collection-item.active .note-count {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.tags-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.tag-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px 0;
+}
+
+.tag-filter:hover {
+    color: #1a73e8;
+}
+
+.dark-mode .tag-filter:hover {
+    color: #8ab4f8;
+}
+
+.filter-section h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: #202124;
+}
+
+.dark-mode .filter-section h3 {
+    color: #e8eaed;
+}
+
+.no-notes {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-style: italic;
+}
+
+.dark-mode .no-notes {
+    color: #aaa;
+}
+
+.error {
+    text-align: center;
+    padding: 40px;
+    color: #d32f2f;
+    font-weight: 500;
+}
+
+.dark-mode .error {
+    color: #f44336;
+}
+
+.collections-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.collections-header h3 {
+    margin: 0;
+}
+
+.add-collection-button {
+    background: none;
+    border: none;
+    color: #1a73e8;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.add-collection-button:hover {
+    background: rgba(26, 115, 232, 0.1);
+}
+
+.dark-mode .add-collection-button {
+    color: #8ab4f8;
+}
+
+.dark-mode .add-collection-button:hover {
+    background: rgba(138, 180, 248, 0.1);
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    padding: 24px;
+    width: 400px;
+    max-width: 90%;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .modal-content {
+    background: #333;
+    color: white;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.close {
+    color: #666;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.dark-mode .close {
+    color: #aaa;
+}
+
+.close:hover {
+    color: #333;
+}
+
+.dark-mode .close:hover {
+    color: #fff;
+}
+
+.collection-form {
+    display: flex;
+    gap: 10px;
+}
+
+#collection-name {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.dark-mode #collection-name {
+    background: #444;
+    border-color: #555;
+    color: white;
+}
+
+#collection-color {
+    padding: 0;
+    width: 40px;
+    height: 36px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#add-collection {
+    padding: 8px 16px;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+#add-collection:hover {
+    background: #1557b0;
+}
+
+.dark-mode #add-collection {
+    background: #8ab4f8;
+    color: #202124;
+}
+
+.dark-mode #add-collection:hover {
+    background: #6b9bf8;
+}
+
+@media (max-width: 1200px) {
+    .container {
+        max-width: 100%;
+        padding: 0;
+    }
+}
+
+@media (max-width: 900px) {
+    #notes-container {
+        gap: 15px;
+    }
+    
+    .note {
+        margin: 10px 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+        min-width: 200px;
+    }
+
+    .main-content {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 600px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        min-height: unset;
+        position: static;
+        padding: 15px;
+    }
+
+    .main-content {
+        padding: 15px;
+    }
+
+    #notes-container {
+        grid-template-columns: 1fr;
+    }
+
+    .controls {
+        flex-direction: column;
+    }
+
+    #search, #sort {
+        width: 100%;
+    }
+}
+
+.inline-collection-form {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.dark-mode .inline-collection-form {
+    background: #333;
+    border-color: #444;
+}
+
+#collection-name {
+    flex: 1;
+    min-width: 0;
+}
+
+.color-picker-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+#collection-color {
+    width: 32px;
+    height: 32px;
+    padding: 2px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.form-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.save-collection,
+.cancel-collection {
+    background: none;
+    border: none;
+    padding: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.save-collection {
+    color: #4CAF50;
+}
+
+.cancel-collection {
+    color: #ff4444;
+}
+
+.save-collection:hover {
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.cancel-collection:hover {
+    background: rgba(255, 68, 68, 0.1);
+}
+
+.dark-mode .save-collection {
+    color: #81c784;
+}
+
+.dark-mode .cancel-collection {
+    color: #ff6b6b;
 }
