@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Tab Notes",
-    "version": "1.0",
+    "version": "1.1",
     "description": "Create and manage notes for specific browser tabs",
     "permissions": [
       "storage",
