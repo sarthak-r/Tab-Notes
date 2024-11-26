@@ -27,6 +27,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         search: ''
     };
 
+    let autoSaveTimeout;
+    const AUTOSAVE_DELAY = 1000; // 1 second delay after typing stops
+
     function formatDate(dateString) {
         return new Date(dateString).toLocaleString();
     }
@@ -52,6 +55,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return notes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             case 'date-asc':
                 return notes.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            case 'edited-desc':
+                return notes.sort((a, b) => new Date(b.lastEdited) - new Date(a.lastEdited));
+            case 'edited-asc':
+                return notes.sort((a, b) => new Date(a.lastEdited) - new Date(b.lastEdited));
             default:
                 return notes;
         }
@@ -210,7 +217,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tagsContainer = document.createElement('div');
         tagsContainer.className = 'filter-section';
         tagsContainer.innerHTML = `
-            <h3>Tags</h3>
+            <div class="section-header">
+                <h3>Tags</h3>
+                ${activeFilters.tags.size > 0 ? `
+                    <button class="reset-tags-button" title="Reset Tags">
+                        <i class="fas fa-times"></i>
+                    </button>
+                ` : ''}
+            </div>
             <div class="tags-list">
                 ${allTags.map(tag => `
                     <label class="tag-filter">
@@ -235,19 +249,46 @@ document.addEventListener('DOMContentLoaded', async () => {
                 loadNotes();
             });
         });
+
+        const resetTagsButton = filterPanel.querySelector('.reset-tags-button');
+        if (resetTagsButton) {
+            resetTagsButton.addEventListener('click', () => {
+                activeFilters.tags.clear();
+                loadNotes();
+            });
+        }
     }
 
     async function loadNotes() {
         try {
-            // Get notes
+            // Capture current note contents before resorting
+            const currentContents = new Map();
+            document.querySelectorAll('.note').forEach(noteElement => {
+                const url = noteElement.querySelector('.save-note').dataset.url;
+                const content = noteElement.querySelector('.note-content').innerHTML;
+                currentContents.set(url, content);
+            });
+
+            // Get notes if not already loaded
             if (!allNotes.length) {
                 allNotes = await Storage.getAllNotesWithUrls();
             }
-            
-            // Get all unique tags
+
             allTags = [...new Set(allNotes.flatMap(note => note.tags || []))];
             
             // Get collections
+            // Update allNotes with current content
+            allNotes = allNotes.map(note => {
+                if (currentContents.has(note.url)) {
+                    return {
+                        ...note,
+                        notes: currentContents.get(note.url)
+                    };
+                }
+                return note;
+            });
+
+            // Get collections and apply filters/sorting
             collections = await Storage.getCollections();
 
             // Render filter panel
@@ -260,6 +301,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sortCriteria = sortSelect.value;
             filteredNotes = sortNotes(filteredNotes, sortCriteria);
 
+            // Render notes
             notesContainer.innerHTML = '';
             if (filteredNotes.length === 0) {
                 notesContainer.innerHTML = '<p class="no-notes">No notes found.</p>';
@@ -268,39 +310,77 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             filteredNotes.forEach(({ url, notes, createdAt, lastEdited, tags = [], collectionId }) => {
                 const collection = collections.find(c => c.id === collectionId);
+                const trimmedUrl = url.length > 15 ? url.substring(0, 15) + '...' : url;
                 const noteElement = document.createElement('div');
                 noteElement.className = 'note';
                 noteElement.innerHTML = `
                     <div class="note-header">
-                        <h2><a href="#" data-url="${url}">
-                            <i class="fas fa-link" aria-hidden="true"></i> ${url}
+                        <h2><a href="#" data-url="${url}" title="${url}">
+                            <i class="fas fa-link" aria-hidden="true"></i> ${trimmedUrl}
                         </a></h2>
+                        <div class="note-actions">
+                            <div class="note-menu">
+                                <button class="menu-trigger">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="menu-dropdown">
+                                    <div class="menu-item timestamps">
+                                        <div><i class="fas fa-calendar-alt"></i> Created: ${formatDate(createdAt)}</div>
+                                        <div><i class="fas fa-edit"></i> Last edited: ${formatDate(lastEdited)}</div>
+                                    </div>
+                                    <div class="menu-separator"></div>
+                                    <div class="menu-item collection-selector">
+                                        <i class="fas fa-folder"></i> Collection:
+                                        <select class="collection-select" data-url="${url}">
+                                            <option value="">No Collection</option>
+                                            ${collections.map(c => `
+                                                <option value="${c.id}" ${c.id === collectionId ? 'selected' : ''}>
+                                                    ${c.name}
+                                                </option>
+                                            `).join('')}
+                                        </select>
+                                    </div>
+                                    <div class="menu-item tags-editor">
+                                        <i class="fas fa-tags"></i> Tags:
+                                        <input type="text" class="tags-input" data-url="${url}" placeholder="Add tags and press enter...">
+                                        <div class="tags-container">
+                                            ${tags.map(tag => `
+                                                <span class="tag">
+                                                    ${tag}
+                                                    <span class="remove-tag" data-tag="${tag}">&times;</span>
+                                                </span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                    <div class="menu-separator"></div>
+                                    <button class="menu-item delete-note" data-url="${url}">
+                                        <i class="fas fa-trash-alt"></i> Delete Note
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="note-content" contenteditable="true">${notes}</div>
+                    <div class="note-footer">
+                        <div class="note-tags">
+                            ${tags.map(tag => `
+                                <span class="tag">${tag}</span>
+                            `).join('')}
+                        </div>
                         ${collection ? `
                             <div class="note-collection" style="background: ${collection.color}">
                                 ${collection.name}
                             </div>
                         ` : ''}
                     </div>
-                    <div class="note-content" contenteditable="true">${notes}</div>
-                    <div class="note-tags">
-                        ${tags.map(tag => `
-                            <span class="tag">${tag}</span>
-                        `).join('')}
-                    </div>
-                    <div class="note-timestamps">
-                        <span><i class="fas fa-calendar-alt" aria-hidden="true"></i> Created: ${formatDate(createdAt)}</span>
-                        <span><i class="fas fa-edit" aria-hidden="true"></i> Last edited: ${formatDate(lastEdited)}</span>
-                    </div>
                     <div class="action-buttons">
                         <button class="save-note" data-url="${url}">
-                            <i class="fas fa-save" aria-hidden="true"></i> Save
-                        </button>
-                        <button class="delete-note" data-url="${url}">
-                            <i class="fas fa-trash-alt" aria-hidden="true"></i> Delete
+                            <i class="fas fa-save"></i> Save
                         </button>
                     </div>
                 `;
                 notesContainer.appendChild(noteElement);
+                initializeNoteEditor(noteElement);
             });
 
             // Add event listeners
@@ -332,6 +412,75 @@ document.addEventListener('DOMContentLoaded', async () => {
                         loadNotes();
                     }
                 });
+            });
+
+            // Collection change handler
+            document.querySelectorAll('.collection-select').forEach(select => {
+                select.addEventListener('change', async (e) => {
+                    e.stopPropagation();
+                    const url = e.target.dataset.url;
+                    const newCollectionId = e.target.value;
+                    const note = allNotes.find(n => n.url === url);
+                    await Storage.saveNotes(url, note.notes, note.tags, newCollectionId);
+                    allNotes = await Storage.getAllNotesWithUrls(); // Refresh notes
+                    loadNotes();
+                });
+            });
+
+            // Tags input handler
+            document.querySelectorAll('.tags-input').forEach(input => {
+                input.addEventListener('keydown', async (e) => {
+                    if (e.key === 'Enter' && input.value.trim()) {
+                        e.preventDefault();
+                        const url = input.dataset.url;
+                        const note = allNotes.find(n => n.url === url);
+                        const newTag = input.value.trim();
+                        
+                        // Add new tag if it doesn't exist
+                        if (!note.tags.includes(newTag)) {
+                            const updatedTags = [...note.tags, newTag];
+                            await Storage.saveNotes(url, note.notes, updatedTags, note.collectionId);
+                            allNotes = await Storage.getAllNotesWithUrls(); // Refresh notes
+                            loadNotes();
+                        }
+                        input.value = ''; // Clear input after adding tag
+                    }
+                });
+            });
+
+            // Add tag removal handler
+            document.querySelectorAll('.remove-tag').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const url = e.target.closest('.tags-editor').querySelector('.tags-input').dataset.url;
+                    const tagToRemove = e.target.dataset.tag;
+                    const note = allNotes.find(n => n.url === url);
+                    const updatedTags = note.tags.filter(t => t !== tagToRemove);
+                    await Storage.saveNotes(url, note.notes, updatedTags, note.collectionId);
+                    allNotes = await Storage.getAllNotesWithUrls(); // Refresh notes
+                    loadNotes();
+                });
+            });
+
+            // Add menu toggle handlers
+            document.querySelectorAll('.menu-trigger').forEach(trigger => {
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const dropdown = e.target.closest('.note-menu').querySelector('.menu-dropdown');
+                    document.querySelectorAll('.menu-dropdown.show').forEach(menu => {
+                        if (menu !== dropdown) menu.classList.remove('show');
+                    });
+                    dropdown.classList.toggle('show');
+                });
+            });
+
+            // Close menus when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.note-menu')) {
+                    document.querySelectorAll('.menu-dropdown.show').forEach(menu => {
+                        menu.classList.remove('show');
+                    });
+                }
             });
         } catch (error) {
             console.error('Error loading notes:', error);
@@ -389,4 +538,74 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Initial load
     await loadNotes();
+
+    function initializeNoteEditor(noteElement) {
+        const content = noteElement.querySelector('.note-content');
+        const saveButton = noteElement.querySelector('.save-note');
+        const url = saveButton.dataset.url;
+
+        let autoSaveTimeout;
+        const AUTOSAVE_DELAY = 1000;
+
+        content.addEventListener('input', () => {
+            clearTimeout(autoSaveTimeout);
+            saveButton.innerHTML = '<i class="fas fa-save"></i> Save';
+            
+            autoSaveTimeout = setTimeout(async () => {
+                const note = allNotes.find(n => n.url === url);
+                const currentTime = new Date().toISOString();
+                await Storage.saveNotes(url, content.innerHTML, note.tags, note.collectionId);
+                
+                // Update the note's lastEdited time in our local array
+                note.lastEdited = currentTime;
+                
+                // Update the timestamp display in the menu
+                const timestampDiv = noteElement.querySelector('.timestamps');
+                if (timestampDiv) {
+                    timestampDiv.innerHTML = `
+                        <div><i class="fas fa-calendar-alt"></i> Created: ${formatDate(note.createdAt)}</div>
+                        <div><i class="fas fa-edit"></i> Last edited: ${formatDate(currentTime)}</div>
+                    `;
+                }
+                
+                saveButton.innerHTML = '<i class="fas fa-check"></i> Saved';
+                
+                // If currently sorted by edit time, refresh the sort
+                const currentSort = document.getElementById('sort').value;
+                if (currentSort.startsWith('edited-')) {
+                    loadNotes();
+                }
+                
+                setTimeout(() => {
+                    saveButton.innerHTML = '<i class="fas fa-save"></i> Save';
+                }, 2000);
+            }, AUTOSAVE_DELAY);
+        });
+    }
+
+    async function exportData() {
+        try {
+            const data = {
+                notes: allNotes,
+                collections: collections,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `tab-notes-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error exporting data:', error);
+        }
+    }
+
+    // Add this to your DOMContentLoaded event listener
+    document.getElementById('export-data').addEventListener('click', exportData);
 });

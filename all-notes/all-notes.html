@@ -8,20 +8,32 @@
 <body>
     <div class="container">
         <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>Tab Notes</h1>
+            </div>
             <div class="controls">
                 <input type="text" id="search" placeholder="Search notes...">
                 <select id="sort">
-                    <option value="date-desc">Newest First</option>
-                    <option value="date-asc">Oldest First</option>
+                    <option value="date-desc">Created - Newest First</option>
+                    <option value="date-asc">Created - Oldest First</option>
+                    <option value="edited-desc">Edited - Newest First</option>
+                    <option value="edited-asc">Edited - Oldest First</option>
                 </select>
             </div>
             <div id="filter-panel"></div>
             <div class="theme-toggle">
-                <input type="checkbox" id="dark-mode-toggle">
-                <label for="dark-mode-toggle" class="toggle-label">
-                    <i class="fas fa-sun"></i>
-                    <i class="fas fa-moon"></i>
-                </label>
+                <div class="toggle-container">
+                    <label class="switch" title="Toggle Light/Dark Mode">
+                        <input type="checkbox" id="dark-mode-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="toggle-label">Dark Mode</span>
+                </div>
+            </div>
+            <div class="export-section">
+                <button id="export-data" class="export-button">
+                    <i class="fas fa-download"></i> Export
+                </button>
             </div>
         </div>
         <div class="main-content">

@@ -173,8 +173,9 @@ header h1 {
 .note-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 10px;
+    gap: 8px;
 }
 
 .note-collection {
@@ -182,6 +183,8 @@ header h1 {
     border-radius: 4px;
     font-size: 12px;
     color: white;
+    margin-left: auto;
+    align-self: flex-start;
 }
 
 .note-tags {
@@ -227,18 +230,21 @@ header h1 {
 }
 
 .action-buttons button {
-    padding: 6px 12px;
+    padding: 4px 8px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 4px;
+    font-size: 12px;
 }
 
 .save-note {
     background: #4CAF50;
     color: white;
+    min-width: 60px;
+    justify-content: center;
 }
 
 .save-note:hover {
@@ -255,7 +261,9 @@ header h1 {
 }
 
 .note h2 {
-    margin-top: 0;
+    margin: 0;
+    flex: 1;
+    min-width: 0;
     font-size: 1.2em;
     cursor: pointer;
     text-decoration: none;
@@ -320,7 +328,79 @@ footer a:hover {
 
 .theme-toggle {
     margin-top: auto;
-    padding-top: 20px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #ddd;
+}
+
+.dark-mode .theme-toggle {
+    border-color: #444;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.toggle-label {
+    font-size: 14px;
+    color: #666;
+}
+
+.dark-mode .toggle-label {
+    color: #aaa;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #1a73e8;
+}
+
+.dark-mode input:checked + .slider {
+    background-color: #699beb;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
 }
 
 /* Dark Mode Styles */
@@ -380,66 +460,6 @@ body.dark-mode footer a {
     color: var(--primary-color);
 }
 
-/* Dark mode toggle switch styles */
-.toggle-container {
-    display: flex;
-    align-items: center;
-}
-
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 40px;
-    height: 20px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 20px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 2px;
-    bottom: 2px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: var(--primary-color);
-}
-
-input:checked + .slider:before {
-    transform: translateX(20px);
-}
-
-.toggle-label {
-  font-size: 0.8em;
-  margin-left: 5px;
-}
-
-body.dark-mode .toggle-label {
-  color: #f1f1f1;
-}
-
 .collections-section {
     margin-bottom: 30px;
 }
@@ -448,6 +468,27 @@ body.dark-mode .toggle-label {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    max-height: 250px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.collections-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.collections-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.collections-list::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.dark-mode .collections-list::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .collection-item {
@@ -524,6 +565,27 @@ body.dark-mode .toggle-label {
     flex-direction: column;
     gap: 8px;
     margin-top: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.tags-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tags-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tags-list::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.dark-mode .tags-list::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .tag-filter {
@@ -862,4 +924,332 @@ body.dark-mode .toggle-label {
 
 .dark-mode .cancel-collection {
     color: #ff6b6b;
+}
+
+.note-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.note-menu {
+    position: relative;
+}
+
+.menu-trigger {
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    color: #666;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.menu-trigger:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark-mode .menu-trigger {
+    color: #aaa;
+}
+
+.dark-mode .menu-trigger:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.menu-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    min-width: 250px;
+    display: none;
+    z-index: 100;
+    margin-top: 5px;
+}
+
+.dark-mode .menu-dropdown {
+    background: #333;
+    border-color: #444;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.menu-dropdown.show {
+    display: block;
+}
+
+.menu-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #333;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: none;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.dark-mode .menu-item {
+    color: #f1f1f1;
+}
+
+.menu-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark-mode .menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.menu-item.timestamps {
+    cursor: default;
+    font-size: 12px;
+    color: #666;
+}
+
+.dark-mode .menu-item.timestamps {
+    color: #aaa;
+}
+
+.menu-item.timestamps:hover {
+    background: none;
+}
+
+.menu-separator {
+    height: 1px;
+    background-color: #ddd;
+    margin: 4px 0;
+}
+
+.dark-mode .menu-separator {
+    background-color: #444;
+}
+
+.timestamps div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 0;
+}
+
+.note-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+    gap: 10px;
+}
+
+.note-tags {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+}
+
+.note-collection {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: white;
+    margin-left: auto;
+    align-self: center;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin: 0;
+}
+
+.note h2 {
+    max-width: calc(100% - 40px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.note h2 a {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.collection-selector select,
+.tags-editor input {
+    width: calc(100% - 8px);
+    margin-top: 4px;
+    padding: 4px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+.dark-mode .collection-selector select,
+.dark-mode .tags-editor input {
+    background: #444;
+    border-color: #555;
+    color: #fff;
+}
+
+.collection-selector,
+.tags-editor {
+    flex-direction: column;
+    align-items: flex-start !important;
+    padding: 8px 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.menu-dropdown {
+    min-width: 250px;
+}
+
+.tags-input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.tags-editor {
+    flex-direction: column;
+    align-items: flex-start !important;
+}
+
+.tags-editor .tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.tags-editor .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: #e0e0e0;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.tags-editor .remove-tag {
+    cursor: pointer;
+    color: #666;
+    font-size: 10px;
+}
+
+.dark-mode .tags-editor .tag {
+    background: #444;
+}
+
+.dark-mode .tags-editor .remove-tag {
+    color: #aaa;
+}
+
+.sidebar-header {
+    padding: 16px 0;
+    margin-bottom: 16px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.sidebar-header h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 500;
+    color: #1a73e8;
+}
+
+.dark-mode .sidebar-header {
+    border-color: #444;
+}
+
+.dark-mode .sidebar-header h1 {
+    color: #8ab4f8;
+}
+
+.export-section {
+    padding: 8px 16px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.export-button {
+    padding: 6px 12px;
+    background: transparent;
+    color: #1a73e8;
+    border: 1px solid #1a73e8;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.export-button:hover {
+    background: rgba(26, 115, 232, 0.1);
+}
+
+.dark-mode .export-button {
+    color: #8ab4f8;
+    border-color: #8ab4f8;
+}
+
+.dark-mode .export-button:hover {
+    background: rgba(138, 180, 248, 0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.reset-tags-button {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.reset-tags-button:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #333;
+}
+
+.dark-mode .reset-tags-button {
+    color: #aaa;
+}
+
+.dark-mode .reset-tags-button:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
 }
